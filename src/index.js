@@ -17,18 +17,19 @@ function toggleMicElement(active) {
 
 /**
  * T
- * @param {*} param0 
+ * @param {*} param0
  */
 function toggleLoudnessDetector({ publisher }) {
   if (publisher.stream.hasAudio) {
     // disable Loudness detector
+    console.log("toggleLoudnessDetector - off");
     turnLoudnessDetector.turnLoudnessDetectorOff();
   } else {
     // activate Loudness detector
-    console.log("toggleLoudnessDetector");
+    console.log("toggleLoudnessDetector - on");
     turnLoudnessDetector.turnLoudnessDetectorOn({
       selectedMicrophoneId: publisher.getAudioSource().id,
-      isAudioEnabled: false,
+      isAudioEnabled: publisher.stream.hasAudio,
     });
   }
 }

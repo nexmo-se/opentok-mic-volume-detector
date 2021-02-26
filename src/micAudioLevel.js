@@ -8,11 +8,12 @@ export default {
   /**
    * This function turns the muted indication off and clear the timeouts.
    */
-  turnMuteIndicationOff: () => {
+  turnMuteIndicationOff: function () {
     clearTimeout(detectLoudnessTimer);
     clearTimeout(turnMuteIndicationOffTimer);
     turnMuteIndicationOffTimer = -1;
     muteIndication = false;
+    this.toggleLoudnessDetector();
   },
 
   /**
@@ -54,7 +55,7 @@ export default {
 
       const detectLoudness = () => {
         // Keep running only if audio is not enabled and we have a valid analyser
-        console.log("detectLoudness---start");
+        console.log("detectLoudness---start", isAudioEnabled);
         if (isAudioEnabled || !loudnessDetector.analyser) {
           return;
         }
@@ -73,19 +74,19 @@ export default {
             // If we are just now turning on the mute indication, set a timer to turn it off
             // in AUTO_HIDE_MUTE_INDICATION_POPUP_DELAY seconds
             if (!muteIndication && turnMuteIndicationOffTimer === -1) {
-              // turn loudness indicator ON
-              muteIndication = true;
-              this.toggleLoudnessDetector();
+              this.turnLoudnessDetectorOff();
               turnMuteIndicationOffTimer = setTimeout(() => {
                 // turn off the mute indicator and toggle the loudnessDetector
                 this.turnMuteIndicationOff();
-                this.toggleLoudnessDetector();
                 this.turnLoudnessDetectorOn({
                   selectedMicrophoneId,
                   isAudioEnabled,
                 });
                 console.log("Auto hide speaking popup");
               }, AUTO_HIDE_MUTE_INDICATION_POPUP_DELAY);
+              // turn loudness indicator ON
+              muteIndication = true;
+              this.toggleLoudnessDetector();
             }
           }
         }
@@ -111,7 +112,7 @@ export default {
       loudnessDetector.source = null;
       loudnessDetector.stream = null;
       loudnessDetector.audioContext = null;
-      this.turnMuteIndicationOff();
     }
+    this.turnMuteIndicationOff();
   },
 };
