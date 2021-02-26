@@ -15,8 +15,11 @@ function toggleMicElement(active) {
     : "Microphone Muted";
 }
 
+/**
+ * T
+ * @param {*} param0 
+ */
 function toggleLoudnessDetector({ publisher }) {
-  console.log("toggleLoudnessDetector", publisher.stream.hasAudio);
   if (publisher.stream.hasAudio) {
     // disable Loudness detector
     turnLoudnessDetector.turnLoudnessDetectorOff();
@@ -33,11 +36,6 @@ function toggleLoudnessDetector({ publisher }) {
 function initializeSession({ apiKey, sessionId, token }) {
   const session = OT.initSession(apiKey, sessionId, {});
   const publisher = OT.initPublisher("publisher");
-
-  publisher.on("videoElementCreated", (event) => {
-    console.log("videoElementCreated", event);
-  });
-
   session.on("streamCreated", function streamCreated(event) {
     var subscriberOptions = {
       insertMode: "append",
@@ -57,7 +55,6 @@ function initializeSession({ apiKey, sessionId, token }) {
   });
 
   session.on("streamPropertyChanged", function streamPropertyChanged(event) {
-    console.log("streamPropertyChanged", event);
     if (event.stream && event.stream.id === publisher.stream.id) {
       toggleLoudnessDetector({ publisher });
     }
