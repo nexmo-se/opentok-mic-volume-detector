@@ -9,14 +9,13 @@ module.exports = {
   },
   devtool: "inline-source-map",
   devServer: {
-    contentBase: "./dist",
+    // contentBase: "./dist",
     hot: true,
   },
   plugins: [
     new CleanWebpackPlugin({ cleanStaleWebpackAssets: false }),
     new HtmlWebpackPlugin({
-      title: "Output Management",
-      title: "Development",
+      template: "index.html",
     }),
   ],
   output: {

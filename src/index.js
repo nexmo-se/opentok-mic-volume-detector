@@ -1,6 +1,6 @@
 import credentials from "../config";
 import OT from "@opentok/client";
-import turnLoudnessDetectorOn from "./micAudioLevel";
+import turnLoudnessDetector from "./micAudioLevel";
 
 function handleError(error) {
   if (error) {
@@ -8,11 +8,25 @@ function handleError(error) {
   }
 }
 
-function toggleLoudnessDetector ({stream}) {
-  if (stream.hasAudio()) {
+function toggleMicElement(active) {
+  console.log("toggleMicAudio", active);
+  document.getElementById("audio-muted-mic").innerHTML = active
+    ? "Microphone Active"
+    : "Microphone Muted";
+}
+
+function toggleLoudnessDetector({ publisher }) {
+  console.log("toggleLoudnessDetector", publisher.stream.hasAudio);
+  if (publisher.stream.hasAudio) {
     // disable Loudness detector
+    turnLoudnessDetector.turnLoudnessDetectorOff();
   } else {
     // activate Loudness detector
+    console.log("toggleLoudnessDetector");
+    turnLoudnessDetector.turnLoudnessDetectorOn({
+      selectedMicrophoneId: publisher.getAudioSource().id,
+      isAudioEnabled: false,
+    });
   }
 }
 
@@ -42,6 +56,13 @@ function initializeSession({ apiKey, sessionId, token }) {
     console.log("You were disconnected from the session.", event.reason);
   });
 
+  session.on("streamPropertyChanged", function streamPropertyChanged(event) {
+    console.log("streamPropertyChanged", event);
+    if (event.stream && event.stream.id === publisher.stream.id) {
+      toggleLoudnessDetector({ publisher });
+    }
+  });
+
   // Connect to the session
   session.connect(token, async function callback(error) {
     if (error) {
@@ -50,6 +71,14 @@ function initializeSession({ apiKey, sessionId, token }) {
       // If the connection is successful, publish the publisher to the session
       console.log("Connected", publisher);
       session.publish(publisher, handleError);
+    }
+  });
+
+  document.getElementById("mute-audio").addEventListener("click", (event) => {
+    if (publisher && publisher.stream) {
+      const audioState = !publisher.stream.hasAudio;
+      publisher.publishAudio(audioState);
+      toggleMicElement(audioState);
     }
   });
 }

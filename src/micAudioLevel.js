@@ -10,17 +10,25 @@ export default {
     clearTimeout(detectLoudnessTimer);
     clearTimeout(turnMuteIndicationOffTimer);
     turnMuteIndicationOffTimer = -1;
+    muteIndication = false;
   },
 
-  turnMuteIndicationOffClicked: ({}) => {
-    // todo
+  showLoudnessDetector: () => {
+    if (muteIndication) {
+      document.getElementById("audio-loudness-detector").innerHTML =
+        "You are Speaking but you are muted";
+    } else {
+      document.getElementById("audio-loudness-detector").innerHTML =
+        "Loudness detector disbled";
+    }
   },
-
-  turnLoudnessDetectorOn: async (
-    { selectedMicrophoneId, isAudioEnabled }
-  ) => {
+  turnLoudnessDetectorOn: async function ({
+    selectedMicrophoneId,
+    isAudioEnabled,
+  }) {
     try {
       // Create Audio Context from Mic
+      console.log("Create loudness Detector");
       loudnessDetector.audioContext = new AudioContext();
       loudnessDetector.stream = await navigator.mediaDevices.getUserMedia({
         audio: {
@@ -34,7 +42,7 @@ export default {
       loudnessDetector.analyser = loudnessDetector.audioContext.createAnalyser();
 
       loudnessDetector.source.connect(loudnessDetector.analyser);
-      
+
       // https://developer.mozilla.org/en-US/docs/Web/API/AudioNode
       loudnessDetector.analyser.fftSize = 2048;
       const bufferLength = loudnessDetector.analyser.fftSize;
@@ -45,7 +53,7 @@ export default {
         if (isAudioEnabled || !loudnessDetector.analyser) {
           return;
         }
-
+        console.log("detectLoudness - start - ", muteIndication);
         // Only process the audio if the tab is visible and the popup was not recently dismissed
         if (document.visibilityState === "visible") {
           loudnessDetector.analyser.getByteTimeDomainData(timeDomainData);
@@ -60,17 +68,17 @@ export default {
             // If we are just now turning on the mute indication, set a timer to turn it off
             // in AUTO_HIDE_MUTE_INDICATION_POPUP_DELAY seconds
             if (!muteIndication && turnMuteIndicationOffTimer === -1) {
-              // Turn loudness detection off for DELAY_BETWEEN_MUTE_INDICATION_POPUP seconds
-              // dispatch("turnLoudnessDetectorOff");
+              // turnLoudnessDetectorOff();
+              muteIndication = true;
+              this.showLoudnessDetector();
+              console.log("You are speaking but you are muted!");
               turnMuteIndicationOffTimer = setTimeout(() => {
                 // dispatch("turnMuteIndicationOff"); // turn it off and then toggle
-
-                /* dispatch("toggleLoudnessDetector", undefined, {
-                  root: true,
-                }); */
+                this.turnMuteIndicationOff();
+                this.showLoudnessDetector();
+                console.log("Auto hide speaking popup");
               }, AUTO_HIDE_MUTE_INDICATION_POPUP_DELAY);
             }
-            // commit("SET_MUTE_INDICATION", true);
           }
         }
 
@@ -78,14 +86,13 @@ export default {
       };
 
       detectLoudness();
-      
     } catch (e) {
       // An error has occured, we don't want to bother the user, the only affect
       // is, the user won't see the mute indication
     }
   },
 
-  turnLoudnessDetectorOff: ({ dispatch }) => {
+  turnLoudnessDetectorOff: () => {
     // Check if we have a valid loudnessDetector object before destroying it
     if (loudnessDetector.analyser) {
       loudnessDetector.analyser.disconnect();
@@ -96,7 +103,7 @@ export default {
       loudnessDetector.source = null;
       loudnessDetector.stream = null;
       loudnessDetector.audioContext = null;
-      dispatch("turnMuteIndicationOff");
+      turnMuteIndicationOff();
     }
   },
 };
