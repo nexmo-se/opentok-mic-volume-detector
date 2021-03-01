@@ -55,7 +55,6 @@ export default {
 
       const detectLoudness = () => {
         // Keep running only if audio is not enabled and we have a valid analyser
-        console.log("detectLoudness---start", isAudioEnabled);
         if (isAudioEnabled || !loudnessDetector.analyser) {
           return;
         }
@@ -68,7 +67,6 @@ export default {
             max = Math.max(max, Math.abs(timeDomainData[index] - 128));
           }
           const loudness = max / 128;
-          console.log("Loudnessdetector", loudness);
           // 0.2 is a magical number, it can't be calculated. it was achieved by trial and error.
           if (loudness > 0.2) {
             // If we are just now turning on the mute indication, set a timer to turn it off
@@ -82,7 +80,6 @@ export default {
                   selectedMicrophoneId,
                   isAudioEnabled,
                 });
-                console.log("Auto hide speaking popup");
               }, AUTO_HIDE_MUTE_INDICATION_POPUP_DELAY);
               // turn loudness indicator ON
               muteIndication = true;
