@@ -1,6 +1,6 @@
 import credentials from "../config";
 import OT from "@opentok/client";
-import turnLoudnessDetector from "./micAudioLevel";
+import turnLoudnessDetector from "./loudnessDetector";
 
 function handleError(error) {
   if (error) {
@@ -9,7 +9,6 @@ function handleError(error) {
 }
 
 function toggleMicElement(active) {
-  console.log("toggleMicAudio", active);
   document.getElementById("audio-muted-mic").innerHTML = active
     ? "Microphone Active"
     : "Microphone Muted";
@@ -22,11 +21,9 @@ function toggleMicElement(active) {
 function toggleLoudnessDetector({ publisher }) {
   if (publisher.stream.hasAudio) {
     // disable Loudness detector
-    console.log("toggleLoudnessDetector - off");
     turnLoudnessDetector.turnLoudnessDetectorOff();
   } else {
     // activate Loudness detector
-    console.log("toggleLoudnessDetector - on");
     turnLoudnessDetector.turnLoudnessDetectorOn({
       selectedMicrophoneId: publisher.getAudioSource().id,
       isAudioEnabled: publisher.stream.hasAudio,
