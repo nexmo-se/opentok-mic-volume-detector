@@ -13,7 +13,7 @@ It's good practice to active the loudness detector only if:
 
 ## Code
 
-`src/index.js`
+File `src/index.js`
 
 The index file handles the main actions such as connecting and publishing to the session. 
 
@@ -34,7 +34,7 @@ if (publisher.stream.hasAudio) {
 }
 ```
 
-`src/loudnessDetector.js`
+File `src/loudnessDetector.js`
 
 The loudness detector file is composed by four main functions: `turnMuteIndicationOff`, `toggleLoudnessDetector`, `turnLoudnessDetectorOn` and `turnLoudnessDetectorOff`.
 
