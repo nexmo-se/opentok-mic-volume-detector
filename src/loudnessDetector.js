@@ -48,7 +48,7 @@ export default {
 
       loudnessDetector.source.connect(loudnessDetector.analyser);
 
-      // https://developer.mozilla.org/en-US/docs/Web/API/AudioNode
+      // https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/createAnalyser
       loudnessDetector.analyser.fftSize = 2048;
       const bufferLength = loudnessDetector.analyser.fftSize;
       const timeDomainData = new Uint8Array(bufferLength);
